@@ -1,0 +1,37 @@
+ngx_addon_name=ngx_http_hello_filter_module
+
+CONNECTION_INC="$ngx_addon_dir/ngx_http_hello_module.h"
+
+CONNECTION_SRCS="                                            \
+                $ngx_addon_dir/ngx_http_hello_module.c       \
+                "
+
+
+if [ -f auto/module ] ; then
+    ngx_module_incs=$ngx_addon_dir
+    ngx_module_deps=$CONNECTION_INC
+
+    if [ $ngx_module_link = DYNAMIC ] ; then
+        ngx_module_name="$ngx_addon_name"
+        ngx_module_srcs="$CONNECTION_SRCS"
+
+        . auto/module
+
+    else
+        ngx_module_type=HTTP_AUX_FILTER
+        ngx_module_name=$ngx_addon_name
+        ngx_module_incs=
+        ngx_module_deps=$CONNECTION_INC
+        ngx_module_srcs=$CONNECTION_SRCS
+
+        . auto/module
+    fi
+
+else
+	HTTP_AUX_FILTER_MODULES="$HTTP_AUX_FILTER_MODULES $ngx_addon_name"
+	
+    NGX_ADDON_DEPS="$NGX_ADDON_DEPS $CONNECTION_INC"
+    NGX_ADDON_SRCS="$NGX_ADDON_SRCS $CONNECTION_SRCS"
+
+    CFLAGS="$CFLAGS -I$ngx_addon_dir"
+fi
